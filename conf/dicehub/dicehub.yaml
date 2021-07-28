@@ -11,6 +11,9 @@ service-register:
 
 erda.dicehub.image:
 
+erda.core.dicehub.extension:
+  extension_menu: ${EXTENSION_MENU:{"":""}}
+
 mysql:
   host: "${MYSQL_HOST:localhost}"
   port: "${MYSQL_PORT:3306}"
