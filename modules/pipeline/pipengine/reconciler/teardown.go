@@ -22,10 +22,9 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/erda-project/erda/apistructs"
-	"github.com/erda-project/erda/modules/pipeline/aop"
-	"github.com/erda-project/erda/modules/pipeline/aop/aoptypes"
 	"github.com/erda-project/erda/modules/pipeline/commonutil/costtimeutil"
 	"github.com/erda-project/erda/modules/pipeline/pipengine/reconciler/rlog"
+	"github.com/erda-project/erda/modules/pipeline/providers/aop/aoptypes"
 	"github.com/erda-project/erda/modules/pipeline/spec"
 	"github.com/erda-project/erda/pkg/loop"
 )
@@ -54,7 +53,7 @@ func (r *Reconciler) teardownPipeline(ctx context.Context, p *spec.PipelineWithT
 		// go metrics.PipelineGaugeProcessingAdd(*p.Pipeline, -1)
 		// go metrics.PipelineEndEvent(*p.Pipeline)
 		// aop
-		_ = aop.Handle(aop.NewContextForPipeline(*p.Pipeline, aoptypes.TuneTriggerPipelineAfterExec))
+		_ = r.PluginsManage.Handle(r.PluginsManage.NewContextForPipeline(*p.Pipeline, aoptypes.TuneTriggerPipelineAfterExec))
 	}()
 	defer logrus.Infof("reconciler: pipelineID: %d, pipeline is completed", p.Pipeline.ID)
 	for _, task := range p.Tasks {

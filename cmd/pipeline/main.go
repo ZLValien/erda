@@ -22,6 +22,8 @@ import (
 	_ "github.com/erda-project/erda-infra/providers/mysqlxorm"
 	_ "github.com/erda-project/erda-infra/providers/serviceregister"
 	_ "github.com/erda-project/erda/modules/pipeline"
+	_ "github.com/erda-project/erda/modules/pipeline/providers/aop"
+	_ "github.com/erda-project/erda/modules/pipeline/providers/aop/plugins/all"
 	_ "github.com/erda-project/erda/modules/pipeline/providers/cms"
 )
 
