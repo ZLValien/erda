@@ -29,6 +29,7 @@ import (
 	_ "github.com/erda-project/erda/modules/pipeline/providers/aop/plugins/pipeline/project"
 	_ "github.com/erda-project/erda/modules/pipeline/providers/aop/plugins/pipeline/scene_after"
 	_ "github.com/erda-project/erda/modules/pipeline/providers/aop/plugins/pipeline/scene_before"
+	_ "github.com/erda-project/erda/modules/pipeline/providers/aop/plugins/pipeline/testplan_before"
 	_ "github.com/erda-project/erda/modules/pipeline/providers/aop/plugins/task/autotest_cookie_keep_after"
 	_ "github.com/erda-project/erda/modules/pipeline/providers/aop/plugins/task/autotest_cookie_keep_before"
 	_ "github.com/erda-project/erda/modules/pipeline/providers/aop/plugins/task/echo"

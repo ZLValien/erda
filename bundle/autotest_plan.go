@@ -281,3 +281,23 @@ func (b *Bundle) ListAutoTestGlobalConfig(req apistructs.AutoTestGlobalConfigLis
 
 	return cfgResp.Data, nil
 }
+
+// ListAutoTestGlobalConfigInternal 获取全局配置(内部调用)
+func (b *Bundle) ListAutoTestGlobalConfigInternal(req apistructs.AutoTestGlobalConfigListRequest) ([]apistructs.AutoTestGlobalConfig, error) {
+	host, err := b.urls.DOP()
+	if err != nil {
+		return nil, err
+	}
+	hc := b.hc
+	var cfgResp apistructs.AutoTestGlobalConfigListResponse
+	resp, err := hc.Get(host).Path("/api/autotests/global-configs").Header(httputil.InternalHeader, "bundle").
+		Param("scopeID", req.ScopeID).Param("scope", req.Scope).Do().JSON(&cfgResp)
+	if err != nil {
+		return nil, apierrors.ErrInvoke.InternalError(err)
+	}
+	if !resp.IsOK() || !cfgResp.Success {
+		return nil, toAPIError(resp.StatusCode(), cfgResp.Error)
+	}
+
+	return cfgResp.Data, nil
+}
