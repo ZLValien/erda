@@ -26,7 +26,6 @@ import (
 	"google.golang.org/protobuf/types/known/structpb"
 	"gopkg.in/yaml.v3"
 
-	"github.com/erda-project/erda-infra/base/version"
 	pb "github.com/erda-project/erda-proto-go/core/dicehub/extension/pb"
 	"github.com/erda-project/erda/apistructs"
 	"github.com/erda-project/erda/bundle"
@@ -154,7 +153,8 @@ func (s *extensionService) CreateExtensionVersionByRequest(req *pb.ExtensionVers
 		return nil, apierrors.ErrQueryExtension.InternalError(err)
 	}
 
-	if !specData.CheckDiceVersion(version.Version) {
+	vs := strings.Split(specData.Version, "-")
+	if !specData.CheckDiceVersion(vs[0]) {
 		err := s.db.DeleteExtensionVersion(specData.Name, specData.Version)
 		if err != nil {
 			return nil, apierrors.ErrQueryExtension.InternalError(err)

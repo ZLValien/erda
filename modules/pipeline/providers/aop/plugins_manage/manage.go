@@ -46,6 +46,7 @@ func (p *PluginsManage) Handle(ctx *TuneContext) error {
 	}
 	typ := ctx.SDK.TuneType
 	trigger := ctx.SDK.TuneTrigger
+	fmt.Println("AOP: type: %s, trigger: %s", typ, trigger)
 	logrus.Debugf("AOP: type: %s, trigger: %s", typ, trigger)
 	chain := p.tuneGroup.GetTuneChainByTypeAndTrigger(typ, trigger)
 	if chain == nil || len(chain) == 0 {

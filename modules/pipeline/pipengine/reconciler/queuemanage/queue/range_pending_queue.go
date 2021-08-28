@@ -102,6 +102,7 @@ func (q *defaultQueue) RangePendingQueue() {
 		// precheck before run
 		customKVsOfAOP := map[interface{}]interface{}{}
 		ctx := q.PluginsManage.NewContextForPipeline(*p, aoptypes.TuneTriggerPipelineInQueuePrecheckBeforePop, customKVsOfAOP)
+		fmt.Println("aop2")
 		_ = q.PluginsManage.Handle(ctx)
 		checkResultI, ok := ctx.TryGet(apistructs.PipelinePreCheckResultContextKey)
 		if !ok {

@@ -33,6 +33,7 @@ type provider struct {
 }
 
 func (p *provider) Run(ctx context.Context) error {
+	logrus.Infoln("!!!!!!!!", *p.PluginsManage)
 	logrus.SetFormatter(&logrus.TextFormatter{
 		ForceColors:     true,
 		FullTimestamp:   true,

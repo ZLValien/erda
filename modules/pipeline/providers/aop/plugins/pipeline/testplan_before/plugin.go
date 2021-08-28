@@ -15,7 +15,9 @@
 package testplan_before
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -44,6 +46,9 @@ func (p *Plugin) Name() string {
 }
 
 func (p *Plugin) Handle(ctx *aoptypes.TuneContext) error {
+	//fmt.Println("AOP Start testplanbefore:")
+	fmt.Println("AOP: ", ctx.SDK.Pipeline.PipelineSource)
+
 	// source = autotest
 	if ctx.SDK.Pipeline.PipelineSource != apistructs.PipelineSourceAutoTest || ctx.SDK.Pipeline.IsSnippet {
 		return nil
@@ -58,22 +63,32 @@ func (p *Plugin) Handle(ctx *aoptypes.TuneContext) error {
 	}
 
 	// get TestPlan
+	fmt.Println("!AOP: testplan ", testPlanID)
 	testPlan, err := p.Bundle.GetTestPlanV2(testPlanID)
 	if err != nil {
 		return err
 	}
 	// get config from projectID
+	fmt.Println("!AOP: testplanProject ", testPlan.Data.ProjectID)
 	var autoTestGlobalConfigListRequest apistructs.AutoTestGlobalConfigListRequest
 	autoTestGlobalConfigListRequest.ScopeID = strconv.Itoa(int(testPlan.Data.ProjectID))
+<<<<<<< Updated upstream
 	autoTestGlobalConfigListRequest.Scope = "project-autotest-testcase"
 	autoTestGlobalConfigListRequest.UserID = ctx.SDK.Pipeline.PipelineExtra.Snapshot.PlatformSecrets["dice.user.id"]
 	configs, err := p.Bundle.ListAutoTestGlobalConfig(autoTestGlobalConfigListRequest)
+=======
+	autoTestGlobalConfigListRequest.Scope = "project-autotest"
+	autoTestGlobalConfigListRequest.UserID = ctx.SDK.Pipeline.PipelineExtra.Snapshot.PlatformSecrets["dice.user.id"]
+	configs, err := p.Bundle.ListAutoTestGlobalConfigInternal(autoTestGlobalConfigListRequest)
+>>>>>>> Stashed changes
 	if err != nil {
 		return err
 	}
 
 	var ns string
 	meta := make(apistructs.PipelineReportMeta)
+	ccc, err := json.Marshal(configs)
+	fmt.Println("AOP: config: ", string(ccc))
 	for _, v := range configs {
 		if v.Ns == ctx.SDK.Pipeline.PipelineExtra.Extra.ConfigManageNamespaces[0] {
 			meta["data"] = v

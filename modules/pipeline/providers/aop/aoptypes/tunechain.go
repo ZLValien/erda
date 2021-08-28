@@ -14,7 +14,10 @@
 
 package aoptypes
 
-import "github.com/sirupsen/logrus"
+import (
+	"fmt"
+	"github.com/sirupsen/logrus"
+)
 
 // TuneChain 表示一组有序 TunePoint
 type TuneChain []TunePoint
@@ -28,8 +31,11 @@ func (chain TuneChain) Handle(ctx *TuneContext) error {
 		logrus.Debugf("begin handle tune point, type: %s, trigger: %s, name: %s", point.Type(), ctx.SDK.TuneTrigger, point.Name())
 		if err := point.Handle(ctx); err != nil {
 			logrus.Errorf("end handle tune point, type: %s, trigger: %s, name: %s, failed, err: %v", point.Type(), ctx.SDK.TuneTrigger, point.Name(), err)
+			fmt.Println("end handle tune point, type: %s, trigger: %s, name: %s, failed, err: %v", point.Type(), ctx.SDK.TuneTrigger, point.Name(), err)
 		} else {
 			logrus.Debugf("end handle tune point, type: %s, trigger: %s, name: %s, success", point.Type(), ctx.SDK.TuneTrigger, point.Name())
+			fmt.Println("end handle tune point, type: %s, trigger: %s, name: %s, success", point.Type(), ctx.SDK.TuneTrigger, point.Name())
+
 		}
 	}
 	return nil

@@ -78,6 +78,7 @@ func (tr *TaskRun) Do(itr TaskOp) error {
 
 		// aop: before processing
 		if itr.TuneTriggers().BeforeProcessing != "" {
+			fmt.Println("aop3")
 			_ = tr.PluginsManage.Handle(tr.PluginsManage.NewContextForTask(*tr.Task, *tr.P, itr.TuneTriggers().BeforeProcessing))
 		}
 
@@ -157,6 +158,7 @@ func (tr *TaskRun) waitOp(itr TaskOp, o *Elem) (result error) {
 			errs = append(errs, err.Error())
 		}
 		// aop
+		fmt.Println("aop4")
 		_ = tr.PluginsManage.Handle(tr.PluginsManage.NewContextForTask(*tr.Task, *tr.P, itr.TuneTriggers().AfterProcessing))
 
 	case err := <-o.ErrCh:

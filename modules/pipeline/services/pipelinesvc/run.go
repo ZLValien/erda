@@ -119,6 +119,7 @@ func (s *PipelineSvc) RunPipeline(req *apistructs.PipelineRunRequest) (*spec.Pip
 	}
 
 	// aop
+	fmt.Println("aop1")
 	_ = s.pluginsManage.Handle(s.pluginsManage.NewContextForPipeline(p, aoptypes.TuneTriggerPipelineBeforeExec))
 
 	// send to pipengine reconciler

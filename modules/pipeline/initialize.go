@@ -57,6 +57,7 @@ import (
 
 // Initialize 初始化应用启动服务.
 func (p *provider) Initialize() error {
+
 	conf.Load()
 
 	if conf.Debug() {
@@ -75,7 +76,6 @@ func (p *provider) Initialize() error {
 }
 
 func (p *provider) do() (*httpserver.Server, error) {
-
 	// TODO metric
 	// // metrics
 	// metrics.Initialize()
