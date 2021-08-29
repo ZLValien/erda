@@ -43,6 +43,7 @@ func (svc *Service) CreateTestPlanV2(req apistructs.TestPlanV2CreateRequest) (ui
 		UpdaterID: req.UserID,
 		SpaceID:   req.SpaceID,
 		ProjectID: req.ProjectID,
+		PassRate:  "-",
 	}
 
 	if err := svc.db.CreateTestPlanV2(testPlanV2); err != nil {
@@ -142,6 +143,17 @@ func (svc *Service) UpdateTestPlanV2(req *apistructs.TestPlanV2UpdateRequest) er
 		return err
 	}
 
+	return svc.db.UpdateTestPlanV2(req.TestPlanID, fields)
+}
+
+// UpdateTestPlanV2Byhook update testplan Byhook
+func (svc *Service) UpdateTestPlanV2ByHook(req *apistructs.TestPlanV2UpdateByHookRequest) error {
+	if req.TestPlanID == 0 {
+		return apierrors.ErrUpdateTestPlan.MissingParameter("testPlanID")
+	}
+	fields := make(map[string]interface{}, 0)
+	fields["pass_rate"] = req.PassRate
+	fields["execute_time"] = req.ExecuteTime
 	return svc.db.UpdateTestPlanV2(req.TestPlanID, fields)
 }
 
@@ -405,6 +417,10 @@ func (svc *Service) getChangedFields(req *apistructs.TestPlanV2UpdateRequest, mo
 
 	if len(fields) != 0 {
 		fields["updater_id"] = req.UserID
+	}
+
+	if req.PipelineID != 0 && req.PipelineID != model.PipelineID {
+		fields["pipeline_id"] = req.PipelineID
 	}
 
 	return fields, nil

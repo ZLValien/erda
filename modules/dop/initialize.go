@@ -531,6 +531,21 @@ func registerWebHook(bdl *bundle.Bundle) {
 	if err := bdl.CreateWebhook(ev); err != nil {
 		logrus.Warnf("failed to register pipeline yml event, %v", err)
 	}
+
+	ev = apistructs.CreateHookRequest{
+		Name:   "auto_test_plan_update",
+		Events: []string{bundle.AutoTestPlanEvent},
+		URL:    strutil.Concat("http://", discover.DOP(), "/api/autotests/testplans/actions/hook-for-update"),
+		Active: true,
+		HookLocation: apistructs.HookLocation{
+			Org:         "-1",
+			Project:     "-1",
+			Application: "-1",
+		},
+	}
+	if err := bdl.CreateWebhook(ev); err != nil {
+		logrus.Warnf("failed to register autoTestPlan event, %v", err)
+	}
 }
 
 func exportTestFileTask(ep *endpoints.Endpoints) {

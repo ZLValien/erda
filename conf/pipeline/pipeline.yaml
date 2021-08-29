@@ -32,6 +32,7 @@ erda.core.pipeline.aop:
         - "basic"
         - "apitest-report"
         - "scene-after"
+        - "testplan-after"
     task:
       task_before_exec:
         - "echo"
@@ -62,6 +63,10 @@ erda.core.pipeline.aop:
         - "echo"
 
 erda.core.pipeline.aop.plugins.pipeline.echo:
+
+erda.core.pipeline.aop.plugins.pipeline.testplan-before:
+
+erda.core.pipeline.aop.plugins.pipeline.testplan-after:
 
 erda.core.pipeline.aop.plugins.pipeline.project:
 

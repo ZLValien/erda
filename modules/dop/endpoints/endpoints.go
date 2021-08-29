@@ -392,6 +392,7 @@ func (e *Endpoints) Routes() []httpserver.Endpoint {
 		// 自动化测试 - 测试计划
 		{Path: "/api/autotests/testplans", Method: http.MethodPost, Handler: e.CreateTestPlanV2},
 		{Path: "/api/autotests/testplans/{testPlanID}", Method: http.MethodDelete, Handler: e.DeleteTestPlanV2},
+		{Path: "/api/autotests/testplans/actions/hooks-for-update", Method: http.MethodPut, Handler: e.UpdateTestPlanV2ByHook},
 		{Path: "/api/autotests/testplans/{testPlanID}", Method: http.MethodPut, Handler: e.UpdateTestPlanV2},
 		{Path: "/api/autotests/testplans", Method: http.MethodGet, Handler: e.PagingTestPlansV2},
 		{Path: "/api/autotests/testplans/{testPlanID}", Method: http.MethodGet, Handler: e.GetTestPlanV2},

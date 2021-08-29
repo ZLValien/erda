@@ -17,6 +17,7 @@ package dao
 import (
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
+	"time"
 
 	"github.com/erda-project/erda/apistructs"
 	"github.com/erda-project/erda/pkg/database/dbengine"
@@ -26,12 +27,15 @@ import (
 // TestPlanV2 测试计划V2
 type TestPlanV2 struct {
 	dbengine.BaseModel
-	Name      string
-	Desc      string
-	CreatorID string
-	UpdaterID string
-	ProjectID uint64
-	SpaceID   uint64
+	Name        string
+	Desc        string
+	CreatorID   string
+	UpdaterID   string
+	ProjectID   uint64
+	SpaceID     uint64
+	PipelineID  uint64
+	PassRate    string
+	ExecuteTime *time.Time
 }
 
 // TableName table name

@@ -41,7 +41,7 @@ import (
 )
 
 type provider struct {
-	PipelineCms cmspb.CmsServiceServer `autowired:"erda.core.pipeline.cms.CmsService"`
+	PipelineCms cmspb.CmsServiceServer
 }
 
 func (p *provider) Run(ctx context.Context) error {
