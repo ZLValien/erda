@@ -26,6 +26,11 @@ erda.core.pipeline.aop.plugins.pipeline.echo:
     - "pipeline_before_exec"
     - "pipeline_after_exec"
 
+erda.core.pipeline.aop.plugins.pipeline.testplan-before:
+  tune_type: "pipeline"
+  tune_trigger:
+    - "pipeline_before_exec"
+
 erda.core.pipeline.aop.plugins.pipeline.project:
   tune_type: "pipeline"
   tune_trigger:
