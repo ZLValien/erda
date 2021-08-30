@@ -30,7 +30,6 @@ import (
 
 	"github.com/erda-project/erda/apistructs"
 	"github.com/erda-project/erda/modules/actionagent"
-	"github.com/erda-project/erda/modules/pipeline/aop/aoptypes"
 	"github.com/erda-project/erda/modules/pipeline/conf"
 	"github.com/erda-project/erda/modules/pipeline/pipengine/actionexecutor/plugins/scheduler"
 	"github.com/erda-project/erda/modules/pipeline/pipengine/actionexecutor/plugins/scheduler/executor/plugins/k8sjob"
@@ -38,6 +37,7 @@ import (
 	"github.com/erda-project/erda/modules/pipeline/pipengine/queue/throttler"
 	"github.com/erda-project/erda/modules/pipeline/pipengine/reconciler/taskrun"
 	"github.com/erda-project/erda/modules/pipeline/pkg/errorsx"
+	"github.com/erda-project/erda/modules/pipeline/providers/aop/aoptypes"
 	"github.com/erda-project/erda/modules/pipeline/services/apierrors"
 	"github.com/erda-project/erda/modules/pipeline/services/extmarketsvc"
 	"github.com/erda-project/erda/modules/pipeline/spec"
