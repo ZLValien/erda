@@ -46,6 +46,16 @@ components:
           fixed: true
           placeholder: "输入计划名按回车键查询"
           type: "input"
+        - emptyText: "全部"
+          fixed: true
+          "key": "archive",
+          "label": "归档",
+          "options":
+            - "label": "进行中",
+              "value": "archiving"
+            - "label": "已归档",
+              "value": "archived"
+          "type": "select"
     operations:
       filter:
         key: "filter"

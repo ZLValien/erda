@@ -43,6 +43,7 @@ func (svc *Service) CreateTestPlanV2(req apistructs.TestPlanV2CreateRequest) (ui
 		UpdaterID: req.UserID,
 		SpaceID:   req.SpaceID,
 		ProjectID: req.ProjectID,
+		State:     apistructs.TestPlanV2StateArchiving,
 	}
 
 	if err := svc.db.CreateTestPlanV2(testPlanV2); err != nil {
@@ -403,6 +404,9 @@ func (svc *Service) getChangedFields(req *apistructs.TestPlanV2UpdateRequest, mo
 		fields["desc"] = req.Desc
 	}
 
+	if req.State != "" && req.State != model.State {
+		fields["state"] = req.State
+	}
 	if len(fields) != 0 {
 		fields["updater_id"] = req.UserID
 	}

@@ -48,7 +48,8 @@ type Operate struct {
 // OperationData 解析OperationData
 type OperationData struct {
 	Meta struct {
-		ID uint64 `json:"id"`
+		ID      uint64                     `json:"id"`
+		Archive apistructs.TestPlanV2State `json:"archive"`
 	} `json:"meta"`
 }
 
@@ -68,22 +69,47 @@ func (tpmt *TestPlanManageTable) Render(ctx context.Context, c *apistructs.Compo
 			cond.PageNo = uint64(c.State["pageNo"].(float64))
 		}
 	case "edit":
-		var opreationData OperationData
+		var operationData OperationData
 		odBytes, err := json.Marshal(event.OperationData)
 		if err != nil {
 			return err
 		}
-		if err := json.Unmarshal(odBytes, &opreationData); err != nil {
+		if err := json.Unmarshal(odBytes, &operationData); err != nil {
 			return err
 		}
 		c.State["formModalVisible"] = true
-		c.State["formModalTestPlanID"] = opreationData.Meta.ID
+		c.State["formModalTestPlanID"] = operationData.Meta.ID
 		return nil
+	case "archive":
+		var operationData OperationData
+		odBytes, err := json.Marshal(event.OperationData)
+		if err != nil {
+			return err
+		}
+		if err := json.Unmarshal(odBytes, &operationData); err != nil {
+			return err
+		}
+		testplan, err := bdl.Bdl.GetTestPlanV2(operationData.Meta.ID)
+		if err != nil {
+			return err
+		}
+		err = bdl.Bdl.UpdateTestPlanV2(apistructs.TestPlanV2UpdateRequest{
+			Name:         testplan.Data.Name,
+			Desc:         testplan.Data.Desc,
+			SpaceID:      testplan.Data.SpaceID,
+			Owners:       testplan.Data.Owners,
+			State:        operationData.Meta.Archive,
+			TestPlanID:   testplan.Data.ID,
+			IdentityInfo: apistructs.IdentityInfo{UserID: bdl.Identity.UserID},
+		})
+		if err != nil {
+			return err
+		}
 	}
-
 	// filter带过来的
 	if _, ok := c.State["name"]; ok {
 		cond.Name = c.State["name"].(string)
+		cond.State = c.State["archive"].(apistructs.TestPlanV2State)
 	}
 
 	r, err := bdl.Bdl.PagingTestPlansV2(cond)
@@ -93,7 +119,7 @@ func (tpmt *TestPlanManageTable) Render(ctx context.Context, c *apistructs.Compo
 	// data
 	l := []TableItem{}
 	for _, data := range r.List {
-		l = append(l, TableItem{
+		tableItem := TableItem{
 			Id:   data.ID,
 			Name: data.Name,
 			Owners: map[string]interface{}{
@@ -113,7 +139,23 @@ func (tpmt *TestPlanManageTable) Render(ctx context.Context, c *apistructs.Compo
 					},
 				},
 			},
-		})
+		}
+		if data.State == apistructs.TestPlanV2StateArchiving {
+			tableItem.Operate.Operations["archive"] = map[string]interface{}{
+				"key":    "archive",
+				"text":   "归档",
+				"reload": true,
+				"meta":   map[string]interface{}{"id": data.ID, "archive": apistructs.TestPlanV2StateArchived},
+			}
+		} else {
+			tableItem.Operate.Operations["archive"] = map[string]interface{}{
+				"key":    "archive",
+				"text":   "取消归档",
+				"reload": true,
+				"meta":   map[string]interface{}{"id": data.ID, "archive": apistructs.TestPlanV2StateArchiving},
+			}
+		}
+		l = append(l, tableItem)
 	}
 	c.Data = map[string]interface{}{}
 	c.Data["list"] = l

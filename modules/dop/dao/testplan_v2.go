@@ -32,6 +32,7 @@ type TestPlanV2 struct {
 	UpdaterID string
 	ProjectID uint64
 	SpaceID   uint64
+	State     apistructs.TestPlanV2State
 }
 
 // TableName table name
@@ -73,6 +74,7 @@ func (tp *TestPlanV2Join) Convert2DTO() *apistructs.TestPlanV2 {
 		Creator:   tp.CreatorID,
 		Updater:   tp.UpdaterID,
 		Steps:     []*apistructs.TestPlanV2Step{},
+		State:     tp.State,
 	}
 }
 
@@ -138,7 +140,64 @@ func (client *DBClient) PagingTestPlanV2(req *apistructs.TestPlanV2PagingRequest
 	if len(req.IDs) != 0 {
 		db = db.Where("dice_autotest_plan.id in (?)", req.IDs)
 	}
+	if len(req.State) != 0 {
+		db = db.Where("dice_autest_plan.state in(?)", req.State)
+	}
+	if err := db.Order("created_at DESC").Offset((req.PageNo - 1) * req.PageSize).Limit(req.PageSize).Find(&testPlanJoins).Offset(0).Limit(-1).
+		Count(&total).Error; err != nil {
+		return 0, nil, nil, err
+	}
 
+	var testPlanIDs []uint64
+	result := make([]*apistructs.TestPlanV2, 0, total)
+	for _, v := range testPlanJoins {
+		testPlanIDs = append(testPlanIDs, v.ID)
+		result = append(result, v.Convert2DTO())
+	}
+
+	// get owners
+	testPlanMember, err := client.ListAutoTestPlanMembersByPlanIDs(testPlanIDs, apistructs.TestPlanMemberRoleOwner)
+	if err != nil {
+		return 0, nil, nil, err
+	}
+
+	// set owner in test plan
+	var userIDs []string
+	for _, v := range result {
+		if _, ok := testPlanMember[v.ID]; !ok {
+			continue
+		}
+		for _, m := range testPlanMember[v.ID] {
+			v.Owners = append(v.Owners, m.UserID)
+		}
+		v.Owners = strutil.DedupSlice(v.Owners)
+		userIDs = append(userIDs, v.Owners...)
+		userIDs = append(userIDs, v.Updater, v.Creator)
+	}
+	userIDs = strutil.DedupSlice(userIDs)
+
+	return total, result, userIDs, nil
+}
+
+// PagingTestPlanV2 Page query testplan
+func (client *DBClient) PagingTestPlanV22(req *apistructs.TestPlanV2PagingRequest) (int, []*apistructs.TestPlanV2, []string, error) {
+	var (
+		testPlanJoins []TestPlanV2Join
+		total         int
+	)
+	db := client.Table("dice_autotest_plan").Select("dice_autotest_plan.id, "+
+		"dice_pipeline_reports.type, dice_pipeline_reports.meta").
+		Joins("inner join dice_autotest_space on dice_autotest_plan.space_id = dice_autotest_space.id").
+		Where("dice_autotest_plan.project_id = ?", req.ProjectID).
+		Joins("inner join dice_pipeline_report on dice_pipeline_reports.pipeline_id = dice_autotest_spwheace.id").
+		Where("dice_pipeline_report.type = api")
+
+	if len(req.IDs) != 0 {
+		db = db.Where("dice_autotest_plan.id in (?)", req.IDs)
+	}
+	if len(req.State) != 0 {
+		db = db.Where("dice_autest_plan.state in(?)", req.State)
+	}
 	if err := db.Order("created_at DESC").Offset((req.PageNo - 1) * req.PageSize).Limit(req.PageSize).Find(&testPlanJoins).Offset(0).Limit(-1).
 		Count(&total).Error; err != nil {
 		return 0, nil, nil, err

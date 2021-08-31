@@ -27,7 +27,6 @@ type AutoTestPlanFilter struct{}
 func RenderCreator() protocol.CompRender {
 	return &AutoTestPlanFilter{}
 }
-
 func (tpm *AutoTestPlanFilter) Render(ctx context.Context, c *apistructs.Component, scenario apistructs.ComponentProtocolScenario, event apistructs.ComponentEvent, gs *apistructs.GlobalStateData) error {
 	if event.Operation.String() == "filter" {
 		if _, ok := c.State["values"]; ok {
@@ -45,6 +44,7 @@ func (tpm *AutoTestPlanFilter) Render(ctx context.Context, c *apistructs.Compone
 		}
 	} else {
 		c.State["name"] = ""
+		c.State["archive"] = "archiving"
 	}
 
 	return nil

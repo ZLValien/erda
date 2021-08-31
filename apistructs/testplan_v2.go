@@ -21,6 +21,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+type TestPlanV2State string
+
+const (
+	TestPlanV2StateArchiving TestPlanV2State = "archiving"
+	TestPlanV2StateArchived  TestPlanV2State = "archived"
+)
+
 // TestPlanV2 testplan
 type TestPlanV2 struct {
 	ID        uint64            `json:"id"`
@@ -35,6 +42,7 @@ type TestPlanV2 struct {
 	Steps     []*TestPlanV2Step `json:"steps"`
 	CreateAt  *time.Time        `json:"createAt"`
 	UpdateAt  *time.Time        `json:"updateAt"`
+	State     TestPlanV2State   `json:"state"`
 }
 
 // TestPlanV2CreateRequest testplan v2 create request
@@ -75,11 +83,12 @@ type TestPlanV2CreateResponse struct {
 
 // TestPlanV2UpdateRequest testplan v2 update request
 type TestPlanV2UpdateRequest struct {
-	Name       string   `json:"name"`
-	Desc       string   `json:"desc"`
-	SpaceID    uint64   `json:"spaceID"`
-	Owners     []string `json:"owners"`
-	TestPlanID uint64   `json:"-"`
+	Name       string          `json:"name"`
+	Desc       string          `json:"desc"`
+	SpaceID    uint64          `json:"spaceID"`
+	Owners     []string        `json:"owners"`
+	State      TestPlanV2State `json:"state"`
+	TestPlanID uint64          `json:"-"`
 
 	IdentityInfo
 }
@@ -98,6 +107,9 @@ type TestPlanV2PagingRequest struct {
 	Updater   string   `schema:"updater"`
 	SpaceID   uint64   `schema:"spaceID"`
 	ProjectID uint64   `schema:"projectID"`
+
+	// +optional
+	State TestPlanV2State `schema:"state"`
 
 	// +optional default 1
 	PageNo uint64 `schema:"pageNo"`
