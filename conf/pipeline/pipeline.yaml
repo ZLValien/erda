@@ -25,6 +25,7 @@ erda.core.pipeline.aop:
         - "echo"
         - "project"
         - "scene-before"
+        - "testplan-before"
       pipeline_in_queue_precheck_before_pop:
         - "precheck-before-pop"
       pipeline_after_exec:
