@@ -16,6 +16,7 @@ package testplan_before
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -23,8 +24,8 @@ import (
 	"github.com/erda-project/erda-proto-go/core/pipeline/cms/pb"
 	"github.com/erda-project/erda/apistructs"
 	"github.com/erda-project/erda/bundle"
+	"github.com/erda-project/erda/modules/pipeline/providers/aop"
 	"github.com/erda-project/erda/modules/pipeline/providers/aop/aoptypes"
-	"github.com/erda-project/erda/modules/pipeline/providers/aop/plugins_manage"
 )
 
 var providerInstance provider
@@ -40,6 +41,7 @@ func (p *Plugin) Name() string {
 }
 
 func (p *Plugin) Handle(ctx *aoptypes.TuneContext) error {
+	fmt.Println("!AOP before: ", ctx.SDK.Pipeline.PipelineSource)
 	// source = autotest
 	if ctx.SDK.Pipeline.PipelineSource != apistructs.PipelineSourceAutoTest || ctx.SDK.Pipeline.IsSnippet {
 		return nil
@@ -61,10 +63,10 @@ func (p *Plugin) Handle(ctx *aoptypes.TuneContext) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("!AOP config: ", testPlan)
 	// get config from projectID
 	var autoTestGlobalConfigListRequest apistructs.AutoTestGlobalConfigListRequest
 	autoTestGlobalConfigListRequest.ScopeID = strconv.Itoa(int(testPlan.Data.ProjectID))
-
 	autoTestGlobalConfigListRequest.Scope = "project-autotest-testcase"
 	autoTestGlobalConfigListRequest.UserID = ctx.SDK.Pipeline.PipelineExtra.Snapshot.PlatformSecrets["dice.user.id"]
 	configs, err := p.Bundle.ListAutoTestGlobalConfig(autoTestGlobalConfigListRequest)
@@ -72,6 +74,7 @@ func (p *Plugin) Handle(ctx *aoptypes.TuneContext) error {
 		return err
 	}
 
+	fmt.Println("!AOP config: ", ctx.SDK.Pipeline.PipelineSource)
 	meta := make(apistructs.PipelineReportMeta)
 	for _, v := range configs {
 		if v.Ns == ctx.SDK.Pipeline.PipelineExtra.Extra.ConfigManageNamespaces[0] {
@@ -82,6 +85,8 @@ func (p *Plugin) Handle(ctx *aoptypes.TuneContext) error {
 	if _, ok := meta["data"]; !ok {
 		return errors.New("no found Pipeline NS")
 	}
+
+	fmt.Println("!AOP send:::! ")
 
 	// result 信息
 	_, err = ctx.SDK.Report.Create(apistructs.PipelineReportCreateRequest{
@@ -114,18 +119,16 @@ type provider struct {
 }
 
 func (p *provider) Init(ctx servicehub.Context) error {
-	providerInstance = *p
-	for _, tuneTrigger := range p.Cfg.TuneTrigger {
-		err := plugins_manage.RegisterTunePointToTuneGroup(p.Cfg.TuneType, tuneTrigger, New())
-		if err != nil {
-			panic(err)
-		}
+	err := aop.RegisterTunePoint(New())
+	if err != nil {
+		panic(err)
 	}
 	return nil
 }
 
 func init() {
-	servicehub.Register("erda.core.pipeline.aop.plugins.pipeline.testplan-before", &servicehub.Spec{
+	p := New()
+	servicehub.Register(aop.NewProviderNameByPluginName(p.Type(), p.Name()), &servicehub.Spec{
 		ConfigFunc: func() interface{} {
 			return &config{}
 		},

@@ -61,7 +61,6 @@ func (p *Plugin) Handle(ctx *aoptypes.TuneContext) error {
 
 	// PipelineYmlName is autotest-plan-xxx
 	pipelineNamePre := apistructs.PipelineSourceAutoTestPlan.String() + "-"
-	fmt.Println("!AOP: Start testplan_after,name:", pipelineNamePre)
 	if !strings.HasPrefix(ctx.SDK.Pipeline.PipelineYmlName, pipelineNamePre) {
 		return nil
 	}

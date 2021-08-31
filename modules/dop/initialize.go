@@ -535,7 +535,7 @@ func registerWebHook(bdl *bundle.Bundle) {
 	ev = apistructs.CreateHookRequest{
 		Name:   "auto_test_plan_update",
 		Events: []string{bundle.AutoTestPlanEvent},
-		URL:    strutil.Concat("http://", discover.DOP(), "/api/autotests/testplans/actions/hook-for-update"),
+		URL:    strutil.Concat("http://", discover.DOP(), "/api/autotests/testplans/actions/hooks-for-update"),
 		Active: true,
 		HookLocation: apistructs.HookLocation{
 			Org:         "-1",
