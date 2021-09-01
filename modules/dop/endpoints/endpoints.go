@@ -84,6 +84,7 @@ const (
 	GitDeleteTagCallback    = "/api/actions/git-tag-delete-callback"
 	IssueCallback           = "/api/actions/issue-callback"
 	MrCheckRunCallback      = "/api/actions/check-run-callback"
+	AutoTestRunCallback     = "/api/actions/autotest-plan-run-callback"
 )
 
 type EventCallback struct {
@@ -104,6 +105,7 @@ var eventCallbacks = []EventCallback{
 	{Name: "issue", Path: IssueCallback, Events: []string{"issue"}},
 	{Name: "check-run", Path: MrCheckRunCallback, Events: []string{"check-run"}},
 	{Name: "qa_git_mr_create", Path: "/api/callbacks/git-mr-create", Events: []string{"git_create_mr"}},
+	{Name: "auto_test_plan_update", Path: AutoTestRunCallback, Events: []string{bundle.AutoTestPlanEvent}},
 }
 
 // Routes 返回 endpoints 的所有 endpoint 方法，也就是 route.
@@ -192,6 +194,7 @@ func (e *Endpoints) Routes() []httpserver.Endpoint {
 
 		{Path: IssueCallback, Method: http.MethodPost, Handler: e.IssueCallback},
 
+		{Path: AutoTestRunCallback, Method: http.MethodPost, Handler: e.UpdateTestPlanV2ByHook},
 		// cicd
 		{Path: "/api/cicd/{pipelineID}/tasks/{taskID}/logs", Method: http.MethodGet, Handler: e.CICDTaskLog},
 		{Path: "/api/cicd/{pipelineID}/tasks/{taskID}/logs/actions/download", Method: http.MethodGet, ReverseHandler: e.ProxyCICDTaskLogDownload},

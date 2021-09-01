@@ -23,18 +23,21 @@ import (
 
 // TestPlanV2 testplan
 type TestPlanV2 struct {
-	ID        uint64            `json:"id"`
-	Name      string            `json:"name"`
-	Desc      string            `json:"desc"`
-	ProjectID uint64            `json:"project"`
-	SpaceID   uint64            `json:"spaceID"`
-	SpaceName string            `json:"spaceName"`
-	Creator   string            `json:"creator"`
-	Owners    []string          `json:"owners"`
-	Updater   string            `json:"updater"`
-	Steps     []*TestPlanV2Step `json:"steps"`
-	CreateAt  *time.Time        `json:"createAt"`
-	UpdateAt  *time.Time        `json:"updateAt"`
+	ID          uint64            `json:"id"`
+	Name        string            `json:"name"`
+	Desc        string            `json:"desc"`
+	ProjectID   uint64            `json:"project"`
+	SpaceID     uint64            `json:"spaceID"`
+	SpaceName   string            `json:"spaceName"`
+	Creator     string            `json:"creator"`
+	Owners      []string          `json:"owners"`
+	Updater     string            `json:"updater"`
+	Steps       []*TestPlanV2Step `json:"steps"`
+	PipelineID  uint64            `json:"pipelineID"`
+	PassRate    float64           `json:"passRate"`
+	ExecuteTime *time.Time        `json:"executeTime"`
+	CreateAt    *time.Time        `json:"createAt"`
+	UpdateAt    *time.Time        `json:"updateAt"`
 }
 
 // TestPlanV2CreateRequest testplan v2 create request
@@ -80,7 +83,7 @@ type TestPlanV2UpdateRequest struct {
 	SpaceID    uint64   `json:"spaceID"`
 	Owners     []string `json:"owners"`
 	TestPlanID uint64   `json:"-"`
-
+	PipelineID uint64
 	IdentityInfo
 }
 

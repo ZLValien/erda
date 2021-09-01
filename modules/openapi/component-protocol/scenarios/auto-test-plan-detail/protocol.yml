@@ -23,7 +23,25 @@ hierarchy:
       - executeTaskBreadcrumb
       - executeTaskTable
       - executeAlertInfo
+      - envDrawer
     #      - resultDrawer
+    envDrawer:
+      content: envContainer
+    envContainer:
+      - envBaseInfoTitle
+      - envBaseInfo
+      - envHeaderTitle
+      - envHeaderInfo
+      - envGlobalTitle
+      - envGlobalInfo
+    envHeaderInfo:
+      children:
+        - envHeaderTable
+        - envHeaderText
+    envGlobalInfo:
+      children:
+        - envGlobalTable
+        - envGlobalText
     fileInfoHead:
       left: fileInfoTitle
 #      right: fileHistory
@@ -52,6 +70,31 @@ hierarchy:
       - executeHistoryRefresh
       - executeHistoryTable
 components:
+  envHeaderInfo:
+    type: Tabs
+  envHeaderTitle:
+    type: Title
+  envHeaderTable:
+    type: Table
+  envHeaderText:
+    type: FileEditor
+  envContainer:
+    type: Container
+  envDrawer:
+    type: Drawer
+  envBaseInfo:
+    type: Panel
+  envBaseInfoTitle:
+    type: Title
+  envGlobalInfo:
+    type: Tabs
+  envGlobalTitle:
+    type: Title
+  envGlobalTable:
+    type: Table
+  envGlobalText:
+    type: FileEditor
+
   fileConfig:
     type: Container
   fileExecute:
@@ -170,6 +213,19 @@ rendering:
         - name: "visible"
           value: "{{ scenesSetInParams.visible }}"
     - name: stages
+  executeInfo:
+    - name: envBaseInfo
+      state:
+        - name: "envData"
+          value: "{{ executeInfo.envData }}"
+    - name: envHeaderInfo
+      state:
+        - name: "envData"
+          value: "{{ executeInfo.envData }}"
+    - name: envGlobalInfo
+      state:
+        - name: "envData"
+          value: "{{ executeInfo.envData }}"
   fileDetail:
     - name: executeHead
     - name: executeHistoryTable
@@ -408,3 +464,6 @@ rendering:
       state:
         - name: "testPlanId"
           value: "{{ fileDetail.testPlanId }}"
+    - name: envBaseInfoTitle
+    - name: envHeaderTitle
+    - name: envGlobalTitle

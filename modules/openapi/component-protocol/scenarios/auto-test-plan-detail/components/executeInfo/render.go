@@ -17,7 +17,6 @@ package executeInfo
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -44,13 +43,16 @@ type CommonFileInfo struct {
 }
 
 type PropColumn struct {
-	Label    string `json:"label"`
-	ValueKey string `json:"valueKey"`
+	Label      string                                           `json:"label"`
+	ValueKey   string                                           `json:"valueKey"`
+	RenderType string                                           `json:"renderType"`
+	Operations map[apistructs.OperationKey]apistructs.Operation `json:"operations"`
 }
 
 type State struct {
-	PipelineID     uint64                        `json:"pipelineId"`
-	PipelineDetail *apistructs.PipelineDetailDTO `json:"pipelineDetail"`
+	PipelineID     uint64                          `json:"pipelineId"`
+	PipelineDetail *apistructs.PipelineDetailDTO   `json:"pipelineDetail"`
+	EnvData        apistructs.AutoTestGlobalConfig `json:"envData"`
 }
 
 type reportNew struct {
@@ -95,6 +97,7 @@ func (i *ComponentFileInfo) Render(ctx context.Context, c *apistructs.Component,
 			err = fail
 		}
 	}()
+	var env apistructs.PipelineReport
 	if i.State.PipelineID > 0 {
 		rsp, err := i.CtxBdl.Bdl.GetPipeline(i.State.PipelineID)
 		if err != nil {
@@ -137,12 +140,20 @@ func (i *ComponentFileInfo) Render(ctx context.Context, c *apistructs.Component,
 		if rsp.Status == apistructs.PipelineStatusNoNeedBySystem {
 			i.Data["status"] = "无需执行"
 		}
-		res, err := i.CtxBdl.Bdl.GetPipelineReportSet(i.State.PipelineID, []string{"api-test"})
+		reports, err := i.CtxBdl.Bdl.GetPipelineReportSet(i.State.PipelineID, []string{"api-test", "auto-test-plan"})
 		if err != nil {
 			return err
 		}
-		fmt.Println(res)
-		if res != nil && len(res.Reports) > 0 && res.Reports[0].Meta != nil {
+		var res apistructs.PipelineReportSet
+		for _, v := range reports.Reports {
+			if v.Type == "api-test" {
+				res.Reports = append(res.Reports, v)
+			} else {
+				env = v
+			}
+		}
+
+		if len(res.Reports) > 0 && res.Reports[0].Meta != nil {
 			value, err := json.Marshal(res.Reports[0].Meta)
 			if err != nil {
 				i.Data["autoTestExecPercent"] = "-"
@@ -167,6 +178,13 @@ func (i *ComponentFileInfo) Render(ctx context.Context, c *apistructs.Component,
 		}
 	}
 Label:
+	config, err := convertReportToConfig(env)
+	if err != nil {
+		return err
+	}
+	i.State.EnvData = config
+	i.Data["executeData"] = config
+	i.Data["executeEnv"] = i.State.EnvData
 	i.Props = make(map[string]interface{})
 	i.Props["fields"] = []PropColumn{
 		{
@@ -200,6 +218,22 @@ Label:
 		{
 			Label:    "接口通过率",
 			ValueKey: "autoTestSuccessPercent",
+		},
+		{
+			Label:      "执行环境参数",
+			ValueKey:   "executeEnv",
+			RenderType: "linkText",
+			Operations: map[apistructs.OperationKey]apistructs.Operation{
+				apistructs.ClickOperation: {
+					Key:    "clickEnv",
+					Reload: false,
+					Command: map[string]interface{}{
+						"key":    "set",
+						"target": "envDrawer",
+						"state":  map[string]interface{}{"visible": true},
+					},
+				},
+			},
 		},
 	}
 
@@ -243,4 +277,22 @@ func RenderCreator() protocol.CompRender {
 			Data:       map[string]interface{}{},
 		},
 	}
+}
+
+func convertReportToConfig(env apistructs.PipelineReport) (apistructs.AutoTestGlobalConfig, error) {
+	envByte, err := json.Marshal(env)
+	if err != nil {
+		return apistructs.AutoTestGlobalConfig{}, err
+	}
+	configData := apistructs.PipelineReport{}
+	err = json.Unmarshal(envByte, &configData)
+	if err != nil {
+		return apistructs.AutoTestGlobalConfig{}, err
+	}
+
+	configByte, err := json.Marshal(configData.Meta["data"])
+	var config apistructs.AutoTestGlobalConfig
+	err = json.Unmarshal(configByte, &config)
+
+	return config, nil
 }

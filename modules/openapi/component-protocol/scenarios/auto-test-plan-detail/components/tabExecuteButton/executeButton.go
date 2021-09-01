@@ -258,7 +258,20 @@ func (a *ComponentAction) handleClick(event apistructs.ComponentEvent, gs *apist
 	} else {
 		logrus.Infof("run testplan pipeline success testplan id: %v, pipelineID %v", req.TestPlan.ID, pipeline.Data.ID)
 	}
-	return nil
+	testPlanInfo, err := a.CtxBdl.Bdl.GetTestPlanV2(req.TestPlan.ID)
+	if err != nil {
+		return err
+	}
+	req2 := apistructs.TestPlanV2UpdateRequest{
+		Name:         testPlanInfo.Data.Name,
+		Desc:         testPlanInfo.Data.Desc,
+		SpaceID:      testPlanInfo.Data.SpaceID,
+		Owners:       testPlanInfo.Data.Owners,
+		TestPlanID:   testPlanInfo.Data.ID,
+		PipelineID:   pipeline.Data.ID,
+		IdentityInfo: apistructs.IdentityInfo{UserID: a.CtxBdl.Identity.UserID},
+	}
+	return a.CtxBdl.Bdl.UpdateTestPlanV2(req2)
 }
 
 func RenderCreator() protocol.CompRender {
