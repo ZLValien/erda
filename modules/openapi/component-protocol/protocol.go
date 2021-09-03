@@ -128,6 +128,7 @@ func GetProtoComp(p *apistructs.ComponentProtocol, compName string) (c *apistruc
 
 	c, ok := p.Components[compName]
 	if !ok {
+		fmt.Println("!!compName: ", compName)
 		err = fmt.Errorf("empty component [%s] in protocol", compName)
 		return
 	}

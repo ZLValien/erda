@@ -43,6 +43,19 @@ type ReleaseEvent struct {
 	Content ReleaseEventData `json:"content"`
 }
 
+// TestPlanV2UpdateEvent testPlan execute event
+// event: autoTestPlan
+type TestPlanV2UpdateEvent struct {
+	EventHeader
+	Content TestPlanV2UpdateEventData `json:"content"`
+}
+
+type TestPlanV2UpdateEventData struct {
+	TestPlanID  uint64 `json:"testPlanID"`
+	PassRate    float64
+	ExecuteTime *time.Time
+}
+
 // PipelineInstanceEvent 流水线状态变化时发送的事件
 // event: pipeline
 // action: status 见 internal/pipeline/spec/pipeline_status.go#Status

@@ -127,6 +127,24 @@ func (e *Endpoints) UpdateTestPlanV2(ctx context.Context, r *http.Request, vars 
 	return httpserver.OkResp(testPlanID)
 }
 
+// UpdateTestPlanV2ByHook Update test plan by hook.
+func (e *Endpoints) UpdateTestPlanV2ByHook(ctx context.Context, r *http.Request, vars map[string]string) (httpserver.Responser, error) {
+	fmt.Println("!!!!ININININ")
+	var req apistructs.TestPlanV2UpdateEvent
+	if r.Body == nil {
+		return apierrors.ErrUpdateTestPlan.MissingParameter("request body").ToResp(), nil
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return apierrors.ErrUpdateTestPlan.InvalidParameter(err).ToResp(), nil
+	}
+	fmt.Println(req)
+	if err := e.autotestV2.UpdateTestPlanV2ByHook(&req.Content); err != nil {
+		return errorresp.ErrResp(err)
+	}
+
+	return httpserver.OkResp(req)
+}
+
 // PagingTestPlansV2 Page query test plan
 func (e *Endpoints) PagingTestPlansV2(ctx context.Context, r *http.Request, vars map[string]string) (httpserver.Responser, error) {
 	identityInfo, err := user.GetIdentityInfo(r)

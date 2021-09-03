@@ -15,6 +15,8 @@
 package dao
 
 import (
+	"time"
+
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 
@@ -26,12 +28,14 @@ import (
 // TestPlanV2 测试计划V2
 type TestPlanV2 struct {
 	dbengine.BaseModel
-	Name      string
-	Desc      string
-	CreatorID string
-	UpdaterID string
-	ProjectID uint64
-	SpaceID   uint64
+	Name        string
+	Desc        string
+	CreatorID   string
+	UpdaterID   string
+	ProjectID   uint64
+	SpaceID     uint64
+	PassRate    float64
+	ExecuteTime *time.Time
 }
 
 // TableName table name
@@ -42,16 +46,18 @@ func (TestPlanV2) TableName() string {
 // Convert2DTO convert DAO to DTO
 func (tp *TestPlanV2) Convert2DTO() apistructs.TestPlanV2 {
 	return apistructs.TestPlanV2{
-		ID:        tp.ID,
-		Name:      tp.Name,
-		Desc:      tp.Desc,
-		ProjectID: tp.ProjectID,
-		SpaceID:   tp.SpaceID,
-		Creator:   tp.CreatorID,
-		Updater:   tp.UpdaterID,
-		Steps:     []*apistructs.TestPlanV2Step{},
-		CreateAt:  &tp.CreatedAt,
-		UpdateAt:  &tp.UpdatedAt,
+		ID:          tp.ID,
+		Name:        tp.Name,
+		Desc:        tp.Desc,
+		ProjectID:   tp.ProjectID,
+		SpaceID:     tp.SpaceID,
+		Creator:     tp.CreatorID,
+		Updater:     tp.UpdaterID,
+		Steps:       []*apistructs.TestPlanV2Step{},
+		PassRate:    tp.PassRate,
+		ExecuteTime: tp.ExecuteTime,
+		CreateAt:    &tp.CreatedAt,
+		UpdateAt:    &tp.UpdatedAt,
 	}
 }
 
